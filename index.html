@@ -33,6 +33,29 @@
     .timer { font-size:52px; font-weight:bold; color:#f5b942; margin:8px 0; }
     .timer.low { color:#d9534f; }
     .err { color:#ff8080; min-height:22px; }
+
+    /* ===== Новый дизайн ===== */
+    body { background: radial-gradient(ellipse at top, #1f2733 0%, #0c0f13 75%) fixed; }
+    .screen::before { content:''; display:block; height:10px; border-radius:5px; margin-bottom:6px; background:repeating-linear-gradient(45deg,#f5b942 0 14px,#15191f 14px 28px); }
+    h1 { text-shadow:0 0 18px rgba(245,185,66,.45); }
+    button { border-radius:10px; box-shadow:0 3px 0 #b8862a; transition:transform .1s; }
+    button:active { transform:translateY(3px); box-shadow:none; }
+    button.grey { box-shadow:0 3px 0 #252b34; }
+    button.red { box-shadow:0 3px 0 #a03a37; }
+    .info { border:1px solid #2c3542; }
+    #catastrophe { background:linear-gradient(135deg,#3a1d1d,#1c2128); border:2px solid #d9534f; font-size:17px; line-height:1.5; }
+    .cata-title { color:#ff8a80; font-weight:bold; letter-spacing:3px; margin-bottom:6px; }
+    .card { background:linear-gradient(160deg,#252e3a,#151a21); border:2px solid #36404e; border-radius:16px; padding:0 0 8px; overflow:hidden; box-shadow:0 8px 20px rgba(0,0,0,.45); transition:transform .2s; }
+    .card:hover { transform:translateY(-5px); }
+    .card.me { border-color:#f5b942; box-shadow:0 0 22px rgba(245,185,66,.3); }
+    .card.out { filter:grayscale(1); }
+    .card h3 { margin:0 0 6px; padding:12px; background:rgba(245,185,66,.12); border-bottom:1px solid #36404e; font-size:18px; }
+    .ava { display:inline-block; width:30px; height:30px; line-height:30px; border-radius:50%; background:#f5b942; color:#111418; margin-right:8px; font-size:16px; }
+    .row { padding:6px 14px; border-top:1px solid #222a34; }
+    .ico { font-size:20px; width:26px; text-align:center; flex:none; }
+    .txt { flex:1; text-align:left; }
+    .row.open .value { color:#ffd070; }
+    .secret { display:inline-block; border-radius:6px; padding:2px 10px; color:#7b8696; letter-spacing:1px; font-size:13px; background:repeating-linear-gradient(45deg,#1c222b 0 6px,#232b36 6px 12px); }
   </style>
 </head>
 <body>
@@ -120,8 +143,8 @@
     'Восстание машин. Роботы патрулируют поверхность, ждать нужно неизвестно сколько.'
   ];
   const fields = [
-    {key:'profession',label:'Профессия'},{key:'age',label:'Возраст'},{key:'health',label:'Здоровье'},
-    {key:'hobby',label:'Хобби'},{key:'trait',label:'Характер'},{key:'item',label:'Предмет'},{key:'fact',label:'Факт'}
+    {key:'profession',label:'Профессия',icon:'💼'},{key:'age',label:'Возраст',icon:'🎂'},{key:'health',label:'Здоровье',icon:'❤️'},
+    {key:'hobby',label:'Хобби',icon:'🎨'},{key:'trait',label:'Характер',icon:'🎭'},{key:'item',label:'Предмет',icon:'🎒'},{key:'fact',label:'Факт',icon:'📌'}
   ];
 
   let roomCode = null;
@@ -242,17 +265,17 @@
       let value;
       if (open) value = esc(p.data[f.key]);
       else if (mine) value = esc(p.data[f.key]) + ' <span class="mine">(видишь только ты)</span>';
-      else value = '<span class="secret">скрыто</span>';
+      else value = '<span class="secret">🔒 скрыто</span>';
       const btn = (mine && !open && p.alive && canReveal)
         ? '<button onclick="reveal(\'' + f.key + '\')">Открыть</button>' : '';
-      return '<div class="row"><div><div class="label">' + f.label + '</div><div class="value">' + value + '</div></div>' + btn + '</div>';
+      return '<div class="row' + (open ? ' open' : '') + '"><span class="ico">' + f.icon + '</span><div class="txt"><div class="label">' + f.label + '</div><div class="value">' + value + '</div></div>' + btn + '</div>';
     }).join('');
-    return '<div class="card ' + (mine ? 'me ' : '') + (p.alive ? '' : 'out') + '"><h3>' + esc(p.name) + (mine ? ' (ты)' : '') + (p.alive ? '' : ' — вне бункера') + '</h3>' + rows + '</div>';
+    return '<div class="card ' + (mine ? 'me ' : '') + (p.alive ? '' : 'out') + '"><h3><span class="ava">' + esc(p.name.charAt(0).toUpperCase()) + '</span>' + esc(p.name) + (mine ? ' (ты)' : '') + (p.alive ? '' : ' — вне бункера') + '</h3>' + rows + '</div>';
   }
 
   function renderGame() {
     show('game');
-    $('catastrophe').innerHTML = '<b>Катастрофа:</b> ' + esc(room.catastrophe);
+    $('catastrophe').innerHTML = '<div class="cata-title">☢️ КАТАСТРОФА</div>' + esc(room.catastrophe);
     $('status').innerHTML = '<b>Раунд ' + room.round + '.</b> Мест в бункере: <b>' + room.seats + '</b>. Живых игроков: <b>' + alivePlayers().length + '</b>.';
     $('notice').textContent = room.notice || '';
     $('notice').classList.toggle('hidden', !room.notice);
